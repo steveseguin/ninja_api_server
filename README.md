@@ -1,6 +1,6 @@
 # VDO.Ninja API Server
 
-A lightweight WebSocket and HTTP API server for VDO.Ninja real-time communication. This server enables message routing between clients in rooms with support for channeled communication.
+A lightweight WebSocket and HTTP API server for VDO.Ninja clients and other similar services. This server enables message routing between clients in rooms with support for channeled communication.
 
 ## Features
 
