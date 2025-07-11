@@ -166,6 +166,14 @@ location / {
 }
 ```
 
+## VDO.NInja integration
+
+To use this server with your own deployment of VDO.Ninja, uncomment the following line in the VDO.Ninja index.html file:
+```
+// session.apiserver = "wss://api.vdo.ninja:443"; // specifiy a custom websocket API URL.
+```
+Also change the websocket address on that line to your own server. SSL is most likely required, so either ensure you have a valid SSL certificate deployed and configured, or consider using Cloudflare's CDN to add SSL via its CDN tunnel.
+
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the LICENSE file for details.
@@ -176,4 +184,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues and feature requests, please use the GitHub issue tracker.
+For issues and feature requests, please use the GitHub issue tracker or Discord (discord.vdo.ninja).  Support for those self-deploying VDO.Ninja is limited; Steve just doesn't have time to hand-hold those lacking dev-ops experience, but he will try to accomodate geninue issues.
