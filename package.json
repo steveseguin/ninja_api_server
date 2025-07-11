@@ -1,0 +1,40 @@
+{
+  "name": "vdo-ninja-api",
+  "version": "1.0.0",
+  "description": "A WebSocket and HTTP API server for VDO.Ninja real-time communication",
+  "main": "apiserver.js",
+  "scripts": {
+    "start": "node apiserver.js",
+    "dev": "nodemon apiserver.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket",
+    "api",
+    "real-time",
+    "vdo-ninja",
+    "communication",
+    "streaming"
+  ],
+  "author": "",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}
