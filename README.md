@@ -16,7 +16,7 @@ A lightweight WebSocket and HTTP API server for VDO.Ninja real-time communicatio
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/steveseguin/ninja_api_server
 cd vdo-ninja-api
 ```
 
