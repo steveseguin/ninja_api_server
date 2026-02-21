@@ -6,6 +6,7 @@ const https = require("https");
 const express = require("express");
 const WebSocket = require("ws");
 const cors = require("cors");
+const crypto = require("crypto");
 
 const app = express();
 const callback = {};
@@ -19,6 +20,14 @@ const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
 const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
 const CALLBACK_TIMEOUT = process.env.CALLBACK_TIMEOUT || 5000;
 const SSE_PING_INTERVAL = process.env.SSE_PING_INTERVAL || 60000;
+let WS_MAX_PAYLOAD_BYTES = parseInt(process.env.WS_MAX_PAYLOAD_BYTES || (3 * 1024 * 1024), 10);
+if (!Number.isFinite(WS_MAX_PAYLOAD_BYTES) || WS_MAX_PAYLOAD_BYTES <= 0) {
+    WS_MAX_PAYLOAD_BYTES = 3 * 1024 * 1024;
+}
+let FORM_URLENCODED_MAX_BYTES = parseInt(process.env.FORM_URLENCODED_MAX_BYTES || (1024 * 1024), 10);
+if (!Number.isFinite(FORM_URLENCODED_MAX_BYTES) || FORM_URLENCODED_MAX_BYTES <= 0) {
+    FORM_URLENCODED_MAX_BYTES = 1024 * 1024;
+}
 
 // Middleware
 app.use(express.json());
@@ -41,7 +50,7 @@ if (USE_HTTPS && SSL_KEY_PATH && SSL_CERT_PATH) {
 // WebSocket server
 const websocketServer = new WebSocket.Server({
     noServer: true,
-    maxPayload: 100 * 1024 // 100KB limit
+    maxPayload: WS_MAX_PAYLOAD_BYTES
 });
 
 // Handle WebSocket upgrades
@@ -56,7 +65,7 @@ servers.forEach(server => {
 
 // Helper functions
 function generatePID() {
-    return Math.random().toString(36).substr(2, 9);
+    return crypto.randomBytes(16).toString("hex");
 }
 
 function createCallbackPromise(pid) {
@@ -235,10 +244,28 @@ app.post('/:room/:action', async (req, res) => {
     
     if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
         let formData = '';
+        let formDataBytes = 0;
+        let formTooLarge = false;
         req.on('data', (chunk) => {
+            if (formTooLarge) {
+                return;
+            }
+            formDataBytes += chunk.length;
+            if (formDataBytes > FORM_URLENCODED_MAX_BYTES) {
+                formTooLarge = true;
+                return;
+            }
             formData += chunk;
         });
         req.on('end', async () => {
+            if (formTooLarge) {
+                res.status(413).send('payload-too-large');
+                if (callback[pid]) {
+                    callback[pid].resolve('failed');
+                    delete callback[pid];
+                }
+                return;
+            }
             msg[req.params.action] = parseUrlEncoded(formData);
             const counter = sendToClients(room, channelNum, JSON.stringify(msg));
             
