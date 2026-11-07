@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node apiserver.js",
     "dev": "nodemon apiserver.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/form.test.js"
   },
   "keywords": [
     "websocket",

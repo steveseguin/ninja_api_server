@@ -101,13 +101,10 @@ function sendToClients(room, channelNum, message) {
 }
 
 function parseUrlEncoded(data) {
-    const keyValuePairs = data.split('&');
-    const parsedData = {};
-    keyValuePairs.forEach((pair) => {
-        const [key, value] = pair.split('=');
-        parsedData[key] = decodeURIComponent(value || '');
-    });
-    return parsedData;
+    // Use form decoding rules without throwing on malformed percent escapes.
+    // Object.fromEntries preserves the existing last-value-wins behavior.
+    // A leading separator keeps a literal '?' in the first form field name.
+    return Object.fromEntries(new URLSearchParams('&' + data));
 }
 
 // Routes
@@ -242,7 +239,8 @@ app.post('/:room/:action', async (req, res) => {
     
     const msg = { get: pid };
     
-    if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+    const contentType = req.headers['content-type'] || '';
+    if (contentType.split(';')[0].trim().toLowerCase() === 'application/x-www-form-urlencoded') {
         let formData = '';
         let formDataBytes = 0;
         let formTooLarge = false;
